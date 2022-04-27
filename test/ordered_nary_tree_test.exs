@@ -48,8 +48,8 @@ defmodule OrderedNaryTreeTest do
   test ".add_child/3 appends the given node to the matching parent node" do
     id_not_found = make_ref()
     node_root = build_node("root")
-    [node_a, node_b] = build_nodes(["a", "b"])
-    [node_b_1, node_b_2] = build_nodes(["b_1", "b_2"])
+    [node_a, node_b, node_c, node_d] = build_nodes(["a", "b", "c", "d"])
+    [node_c_1, node_c_2] = build_nodes(["c_1", "c_2"])
     assert OrderedNaryTree.add_child(@empty_tree, id_not_found, node_root) == {:error, :empty_root}
 
     tree = OrderedNaryTree.new(node_root)
@@ -62,20 +62,31 @@ defmodule OrderedNaryTreeTest do
     assert {:ok, tree} = OrderedNaryTree.add_child(tree, node_root.id, node_b)
     assert {:ok, node_root_children} = OrderedNaryTree.children(tree, node_root.id)
     assert length(node_root_children) == 2
+    assert {:ok, tree} = OrderedNaryTree.add_child(tree, node_root.id, node_c)
+    assert {:ok, node_root_children} = OrderedNaryTree.children(tree, node_root.id)
+    assert length(node_root_children) == 3
+    assert {:ok, tree} = OrderedNaryTree.add_child(tree, node_root.id, node_d)
+    assert {:ok, node_root_children} = OrderedNaryTree.children(tree, node_root.id)
+    assert length(node_root_children) == 4
     assert Enum.at(node_root_children, 0) == node_a
     assert Enum.at(node_root_children, 1) == node_b
+    assert Enum.at(node_root_children, 2) == node_c
+    assert Enum.at(node_root_children, 3) == node_d
 
-    assert {:ok, tree} = OrderedNaryTree.add_child(tree, node_b.id, node_b_1)
-    assert {:ok, node_b_children} = OrderedNaryTree.children(tree, node_b.id)
-    assert length(node_b_children) == 1
-    assert Enum.at(node_b_children, 0) == node_b_1
-    assert {:ok, tree} = OrderedNaryTree.add_child(tree, node_b.id, node_b_2)
-    assert {:ok, node_b_children} = OrderedNaryTree.children(tree, node_b.id)
-    assert length(node_b_children) == 2
-    assert Enum.at(node_b_children, 0) == node_b_1
-    assert Enum.at(node_b_children, 1) == node_b_2
+    assert {:ok, tree} = OrderedNaryTree.add_child(tree, node_c.id, node_c_1)
+    assert {:ok, node_c_children} = OrderedNaryTree.children(tree, node_c.id)
+    assert length(node_c_children) == 1
+    assert Enum.at(node_c_children, 0) == node_c_1
     assert {:ok, node_root_children} = OrderedNaryTree.children(tree, node_root.id)
-    assert length(node_root_children) == 1
+    assert length(node_root_children) == 4
+
+    assert {:ok, tree} = OrderedNaryTree.add_child(tree, node_c.id, node_c_2)
+    assert {:ok, node_c_children} = OrderedNaryTree.children(tree, node_c.id)
+    assert length(node_c_children) == 2
+    assert Enum.at(node_c_children, 0) == node_c_1
+    assert Enum.at(node_c_children, 1) == node_c_2
+    assert {:ok, node_root_children} = OrderedNaryTree.children(tree, node_root.id)
+    assert length(node_root_children) == 4
   end
 
   test ".add_child/2 appends the given node to the root" do

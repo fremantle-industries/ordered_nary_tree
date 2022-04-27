@@ -67,7 +67,7 @@ defmodule OrderedNaryTree do
     end
   end
 
-  defp replace_node(n, search_id, func, parent_node \\ nil) do
+  defp replace_node(n, search_id, func, parent_and_older_sibling_nodes \\ nil) do
     case n do
       nil ->
         {:error, :empty_root}
@@ -79,12 +79,16 @@ defmodule OrderedNaryTree do
         {:ok, func.(n)}
 
       %OrderedNaryTree.Node{children: c} = n ->
-        replace_node(c, search_id, func, n)
+        replace_node(c, search_id, func, {n, []})
 
       [n | nodes] ->
-        case replace_node(n, search_id, func, parent_node) do
-          {:ok, n} -> {:ok, %{parent_node | children: [n] ++ nodes}}
-          {:error, :not_found} -> replace_node(nodes, search_id, func, parent_node)
+        {parent_node, older_sibling_nodes} = parent_and_older_sibling_nodes
+        case replace_node(n, search_id, func, {parent_node, older_sibling_nodes}) do
+          {:ok, n} ->
+            {:ok, %{parent_node | children: older_sibling_nodes ++ [n] ++ nodes}}
+
+          {:error, :not_found} ->
+            replace_node(nodes, search_id, func, {parent_node, older_sibling_nodes ++ [n]})
         end
     end
   end
