@@ -11,7 +11,7 @@ Add the `ordered_nary_tree` package to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ordered_nary_tree, "~> 0.0.1"}
+    {:ordered_nary_tree, "~> 0.0.2"}
   ]
 end
 ```

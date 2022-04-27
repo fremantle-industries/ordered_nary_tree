@@ -4,7 +4,7 @@ defmodule OrderedNaryTree.MixProject do
   def project do
     [
       app: :ordered_nary_tree,
-      version: "0.0.1",
+      version: "0.0.2",
       elixir: "~> 1.11",
       package: package(),
       start_permanent: Mix.env() == :prod,
