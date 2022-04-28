@@ -100,6 +100,21 @@ defmodule OrderedNaryTreeTest do
     assert Enum.at(root_children, 0) == node_b
   end
 
+  test ".find/2 returns the node when the given function evaluates to true" do
+    assert OrderedNaryTree.find(@empty_tree, & &1.value == "empty_root") == {:error, :empty_root}
+
+    [root, child_1, child_2, grandchild_1] = build_nodes(["root", "child_1", "child_2", "grandchild_1"])
+    tree = OrderedNaryTree.new(root)
+    {:ok, tree} = OrderedNaryTree.add_child(tree, root.id, child_1)
+    {:ok, tree} = OrderedNaryTree.add_child(tree, root.id, child_2)
+    {:ok, tree} = OrderedNaryTree.add_child(tree, child_2.id, grandchild_1)
+
+    assert {:ok, found_node} = OrderedNaryTree.find(tree, & &1.value == grandchild_1.value)
+    assert found_node == grandchild_1
+
+    assert OrderedNaryTree.find(tree, & &1.value == "not_found") == {:error, :not_found}
+  end
+
   defp build_node(value) do
     OrderedNaryTree.Node.new(value)
   end

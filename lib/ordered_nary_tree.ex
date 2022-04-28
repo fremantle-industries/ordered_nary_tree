@@ -32,7 +32,7 @@ defmodule OrderedNaryTree do
 
   @spec children(t, tree_node_id) :: {:ok, [tree_node]} | {:error, :empty_root | :not_found}
   def children(tree, node_id) do
-    case find_node(tree.root, node_id) do
+    case find_node_by_id(tree.root, node_id) do
       {:ok, n} -> {:ok, n.children}
       {:error, _} = error -> error
     end
@@ -56,14 +56,34 @@ defmodule OrderedNaryTree do
     end
   end
 
-  defp find_node([], _search_id), do: {:error, :not_found}
-  defp find_node(nil, _search_id), do: {:error, :empty_root}
-  defp find_node(%OrderedNaryTree.Node{id: id} = n, search_id) when id == search_id, do: {:ok, n}
-  defp find_node(%OrderedNaryTree.Node{children: c}, search_id), do: find_node(c, search_id)
-  defp find_node([n | nodes], search_id) do
-    case find_node(n, search_id) do
+  @spec find(t, function) :: {:ok, tree_node} | {:error, :empty_root | :not_found}
+  def find(tree, func) do
+    find_node(tree.root, func)
+  end
+
+  defp find_node([], _func), do: {:error, :not_found}
+  defp find_node(nil, _func), do: {:error, :empty_root}
+  defp find_node(%OrderedNaryTree.Node{} = n, func) do
+    case func.(n) do
+      true -> {:ok, n}
+      false -> find_node(n.children, func)
+    end
+  end
+  defp find_node([n | nodes], func) do
+    case find_node(n, func) do
       {:ok, _n} = result -> result
-      {:error, :not_found} -> find_node(nodes, search_id)
+      {:error, :not_found} -> find_node(nodes, func)
+    end
+  end
+
+  defp find_node_by_id([], _search_id), do: {:error, :not_found}
+  defp find_node_by_id(nil, _search_id), do: {:error, :empty_root}
+  defp find_node_by_id(%OrderedNaryTree.Node{id: id} = n, search_id) when id == search_id, do: {:ok, n}
+  defp find_node_by_id(%OrderedNaryTree.Node{children: c}, search_id), do: find_node_by_id(c, search_id)
+  defp find_node_by_id([n | nodes], search_id) do
+    case find_node_by_id(n, search_id) do
+      {:ok, _n} = result -> result
+      {:error, :not_found} -> find_node_by_id(nodes, search_id)
     end
   end
 
