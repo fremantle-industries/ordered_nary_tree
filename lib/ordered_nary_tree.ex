@@ -61,6 +61,13 @@ defmodule OrderedNaryTree do
     find_node(tree.root, func)
   end
 
+  @spec parent(t, tree_node_id) :: {:ok, tree_node} | {:error, :empty_root | :not_found}
+  def parent(tree, node_id) do
+    find_node(tree.root, fn p ->
+      Enum.find(p.children, & &1.id == node_id) != nil
+    end)
+  end
+
   defp find_node([], _func), do: {:error, :not_found}
   defp find_node(nil, _func), do: {:error, :empty_root}
   defp find_node(%OrderedNaryTree.Node{} = n, func) do
